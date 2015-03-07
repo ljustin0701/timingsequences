@@ -33,7 +33,8 @@ class Sequence {
 		void sort();
 		int getSize() {return size;}
 		int getCapacity() {return capacity;}
-		void ensureCapacity(int minCapacity);
+		void expand();
+		void shrink();
 };
 
 #endif

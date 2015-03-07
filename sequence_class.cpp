@@ -4,38 +4,87 @@
 
 #include "sequence_class.h"
 
-Sequence::Sequence() : size(0), capacity(100){arr = new EType [capacity];}
+Sequence::Sequence() : size(0), capacity(100) {arr = new EType[capacity];}
 
-EType Sequence::get(const int index){return arr[index];}
+EType Sequence::get(const int index) {
+	if(index > size || index < 0){
+		std::cerr << "Desired index is out of bounds.\n";
+		return -1;
+	}
+	else
+		return arr[index];
+}
 
-void Sequence::set(int index, const EType &Element){arr[index] = Element;}
+void Sequence::set(int index, const EType &Element) {
+	if(index > size || index < 0){
+		std::cerr << "Desired index is out of bounds.\n";
+		return;
+	}
+	else
+		arr[index] = Element;
+}
 
 void Sequence::insertBack(const EType &Element){   
-	arr[size]  = Element;
-	size++;
+	if(size >= capacity) {
+		expand();
+		arr[size] = Element;
+		size++;
+	}
+	else {
+		arr[size] = Element;
+		size++;
+	}
 }
 
 EType Sequence::removeBack(){
-	EType temp = arr[size-1];
-	size--;
-	return temp;
+	if(size == 0){
+		std::cerr << "Nothing to remove.\n";
+		return -1;
+	}
+	else {
+		EType temp = arr[size-1];
+		size--;
+		if(size <= (capacity/2)-5)
+			shrink();
+		return temp;
+	}
+
 }
 
 void Sequence::insert(int index, const EType &Element){
-	for(int i = size; i > index; i--){
-		arr[i] = arr[i-1];
+	if(size >= capacity) {
+		expand();
+		for(int i = size; i > index; i--){
+			arr[i] = arr[i-1];
+		}
+		arr[index] = Element;
+		size++;
 	}
-	arr[index] = Element;
-	size++;
+	else {
+		for(int i = size; i > index; i--){
+			arr[i] = arr[i-1];
+		}
+		arr[index] = Element;
+		size++;
+	}
 }
 
 EType Sequence::remove(int index){
-	EType removed = arr[index];
-	size--;
-	for(int j = index; j < size; j++){
-		arr[j] = arr[j+1];
+	if(size == 0){
+		std::cerr << "Nothing to remove.\n";
+		return -1;
 	}
-	return removed;
+	else {
+		EType removed = arr[index];
+		size--;
+		for(int j = index; j < size; j++){
+			arr[j] = arr[j+1];
+		}
+		if(size <= (capacity/2)-5)
+			shrink();
+		return removed;
+	}
+	
 }
 
 EType &Sequence::front(){
@@ -74,8 +123,7 @@ void Sequence::sort(){
 	}
 }
 
-void Sequence::ensureCapacity(int minCapacity) {
-	if(capacity >= minCapacity) return;
+void Sequence::expand() {
 	EType *temp = new EType[2*capacity];
 	for (int i = 0; i < capacity; i++)
 		temp[i] = arr[i];
@@ -83,3 +131,13 @@ void Sequence::ensureCapacity(int minCapacity) {
 	arr = temp;
 	capacity*=2;
 }
+
+void Sequence::shrink() {
+	EType *temp = new EType[capacity/2];
+	for(int i = 0; i < (capacity/2)-5; i++)
+		temp[i] = arr[i];
+	delete [] arr;
+	arr = temp;
+	capacity/=2;
+}
+
